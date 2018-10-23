@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user_id: 1
+  position: 1
+  completed: false
+  due: 2018-10-22 21:23:16
+  description: MyText
+
+two:
+  user_id: 1
+  position: 1
+  completed: false
+  due: 2018-10-22 21:23:16
+  description: MyText
