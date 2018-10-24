@@ -46,6 +46,10 @@ gem 'activerecord-postgresql-adapter'
 gem 'acts_as_list'
 gem 'sidekiq'
 gem 'redis'
+gem 'ejs'
+gem 'jquery-rails'
+gem 'jquery-ui-rails'
+gem 'jsonapi-rails'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

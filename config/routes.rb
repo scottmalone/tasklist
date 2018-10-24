@@ -9,5 +9,9 @@ Rails.application.routes.draw do
 
   resources :tasks
 
+  namespace :api do
+    resources :tasks
+  end
+
   get "/healthcheck", to: "healthcheck#index"
 end
