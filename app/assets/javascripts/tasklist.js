@@ -13,6 +13,7 @@ const tasklist = {
         data: form.serialize(),
         success: function(response) {
           tasklist.addNewTask(response);
+          tasklist.removeNewTaskForm();
         }
       });
 
@@ -30,6 +31,9 @@ const tasklist = {
       authenticity_token: window._token
     });
     $("#new-task-container").append(html);
+  },
+  removeNewTaskForm: function() {
+    $("#new-task-container").empty();
   },
   addNewTask: function(response) {
     const template = JST['templates/tasks/show'];
