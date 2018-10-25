@@ -3,6 +3,7 @@ const tasklist = {
     tasklist.bindNewTask();
     tasklist.bindEditTask();
     tasklist.bindToggleCompleted();
+    tasklist.bindShowCompletedCheckbox();
   },
   bindNewTask: function() {
     $("#new-task-link").click(function() {
@@ -118,9 +119,27 @@ const tasklist = {
   },
   updateToggleCompletedUI: function(task) {
     $(task).toggleClass("completed");
-    setTimeout( function() {
-      task.hide();
-    }, 1000);
-
+    if($(task).hasClass("completed")) {
+      $(task).toggleClass("panel-primary panel-success");
+    } else {
+      $(task).toggleClass("panel-success panel-primary");
+    };
+    if($(task).hasClass("completed") && !tasklist.isShowCompletedChecked()) {
+      setTimeout( function() {
+        task.hide();
+      }, 500);
+    };
+  },
+  isShowCompletedChecked: function() {
+    return $("#show-completed-checkbox:checked").length > 0;
+  },
+  bindShowCompletedCheckbox: function() {
+    $("#show-completed-checkbox").change(function() {
+      if(this.checked) {
+        $(".task").show();
+      } else {
+        $(".task.completed").hide();
+      }
+    });
   }
 };
