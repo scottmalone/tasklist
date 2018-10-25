@@ -11,8 +11,9 @@
 // about supported directives.
 //
 //= require jquery
-//= require jquery-ui/widgets/sortable
 //= require jquery_ujs
+//= require jquery-ui/widgets/sortable
+//= require jquery-ui/widgets/datepicker
 //= require activestorage
 //= require turbolinks
 //= require tasklist

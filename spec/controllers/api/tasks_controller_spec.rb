@@ -11,7 +11,6 @@ RSpec.describe Api::TasksController, type: :controller do
       }
     end
     context "when sender is logged in" do
-
       login_user
 
       before do
@@ -52,10 +51,62 @@ RSpec.describe Api::TasksController, type: :controller do
         post :create, params: post_params
       end
 
-      it "returns http success" do
+      it "returns http redirect" do
         expect(response).to have_http_status(:redirect)
       end
+    end
+  end
 
+  describe "PUT #update" do
+    let(:task) { create(:task) }
+    let(:put_params) do
+      {
+        task: {
+          description: "Updated message",
+          due: Time.local(2024, 11, 5, 0, 0, 0)
+        }
+      }
+    end
+    context "when sender is logged in" do
+      login_user
+
+      before do
+        frozen_time = Time.local(2020, 11, 3, 0, 0, 0)
+        Timecop.freeze(frozen_time)
+        put :update, params: put_params.merge(id: task.id)
+      end
+
+      after do
+        Timecop.return
+      end
+
+      it "should have a current_user" do
+        expect(subject.current_user).to_not eq(nil)
+      end
+
+      it "responds to json by default" do
+        expect(response.content_type).to eq "application/vnd.api+json"
+      end
+
+      it "should get a successful (200) response" do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it "the response body has the POSTed attributes" do
+        resp_attrs = JSON.parse(response.body)["data"]["attributes"]
+        expect(resp_attrs["description"]).to eq put_params[:task][:description]
+        expect(resp_attrs["due"].to_datetime).to eq put_params[:task][:due].to_datetime
+      end
+    end
+
+    context "when sender is not logged in" do
+      before do
+        put :update, params: put_params.merge(id: task.id)
+      end
+
+      it "returns http redirect" do
+        expect(response).to have_http_status(:redirect)
+      end
     end
   end
 end
