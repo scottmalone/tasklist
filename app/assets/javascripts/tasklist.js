@@ -2,6 +2,7 @@ const tasklist = {
   setup: function() {
     tasklist.bindNewTask();
     tasklist.bindEditTask();
+    tasklist.bindToggleCompleted();
   },
   bindNewTask: function() {
     $("#new-task-link").click(function() {
@@ -53,6 +54,24 @@ const tasklist = {
       e.preventDefault();
     });
   },
+  bindToggleCompleted: function() {
+    $(".panel-group").on("click", ".toggle-completed-link", function (e) {
+      const link = $(this);
+      const task = $(link).closest(".task");
+      const taskID = $(task).attr("task_id");
+      const newCompletedState = task.hasClass("completed") ? false : true;
+      const url = `/api/tasks/${taskID}`;
+      $.ajax({
+        type: "PUT",
+        url: url,
+        data: ({ task: { completed: newCompletedState } }),
+        success: function(response) {
+          tasklist.updateToggleCompletedUI(task);
+        }
+      });
+      return false;
+    });
+  },
   getNewTaskForm: function() {
     const newTemplate = JST['templates/tasks/new'];
     const html = newTemplate({
@@ -96,5 +115,12 @@ const tasklist = {
       task: response.data.attributes
     });
     $(task).replaceWith(html);
+  },
+  updateToggleCompletedUI: function(task) {
+    $(task).toggleClass("completed");
+    setTimeout( function() {
+      task.hide();
+    }, 1000);
+
   }
 };

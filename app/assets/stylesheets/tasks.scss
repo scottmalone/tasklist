@@ -2,9 +2,18 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
-.task-heading {
+.task-heading, .task-heading i {
   color: white;
-  background-color: #124497;
+}
+.task-heading a:hover {
+  background-color: #428bca;
+}
+.task.completed .task-heading, .task.completed a:hover {
+  background-color: #d6e9c6;
+}
+.task.completed .task-heading {
+  color: white;
+  background-color: green;
 }
 .task-draggable {
   float: left;

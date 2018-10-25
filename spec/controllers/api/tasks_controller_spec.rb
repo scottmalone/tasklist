@@ -63,7 +63,8 @@ RSpec.describe Api::TasksController, type: :controller do
       {
         task: {
           description: "Updated message",
-          due: Time.local(2024, 11, 5, 0, 0, 0)
+          due: Time.local(2024, 11, 5, 0, 0, 0),
+          completed: true
         }
       }
     end
@@ -96,6 +97,14 @@ RSpec.describe Api::TasksController, type: :controller do
         resp_attrs = JSON.parse(response.body)["data"]["attributes"]
         expect(resp_attrs["description"]).to eq put_params[:task][:description]
         expect(resp_attrs["due"].to_datetime).to eq put_params[:task][:due].to_datetime
+      end
+
+      it "can mark an item as completed" do
+        expect(task.completed).to eq false
+        put :update, params: {id: task.id, task: { completed: true } }
+        resp_attrs = JSON.parse(response.body)["data"]["attributes"]
+        expect(task.reload.completed).to eq true
+        expect(resp_attrs["completed"]).to eq true
       end
     end
 
