@@ -4,6 +4,7 @@ const tasklist = {
     tasklist.bindEditTask();
     tasklist.bindToggleCompleted();
     tasklist.bindShowCompletedCheckbox();
+    tasklist.activateSortable();
   },
   bindNewTask: function() {
     $("#new-task-link").click(function() {
@@ -140,6 +141,52 @@ const tasklist = {
       } else {
         $(".task.completed").hide();
       }
+    });
+  },
+  activateSortable: function() {
+    $("#task-container").sortable({
+      start: function(event, ui) {
+        ui.item.startIndex = ui.item.index();
+      },
+      stop: function(event, ui) {
+        var currentPosition = parseInt(ui.item.attr("position"));
+        var positionChange =  ui.item.index() - ui.item.startIndex;
+        var newPosition = currentPosition + positionChange;
+        var taskItem = ui.item[0];
+        tasklist.updateTaskPosition(taskItem, newPosition).then(function(result) {
+          tasklist.repositionItem($(taskItem), result.data.attributes.position);
+        });
+      },
+      axis: "y"
+    });
+  },
+  updateTaskPosition: function(taskItem, taskPosition) {
+    var taskId = taskItem.attributes.task_id.value;
+    var url = '/api/tasks/' + taskId;
+    var data = $.param({ task: { position: taskPosition }});
+    return $.ajax({
+      url: url,
+      type: 'PUT',
+      data: data
+    }).fail(function() {
+      $("#task-container").sortable("cancel");
+    });
+  },
+  repositionItem: function(taskItem, position) {
+    taskItem.attr('position', position);
+    taskItem.removeAttr('style');
+    var previousItems = taskItem.prevAll();
+    var nextItems = taskItem.nextAll();
+    var previousItemsLength = previousItems.length ;
+    var nextItemsLength = nextItems.length;
+    var itemPosition;
+    previousItems.each(function(i, item) {
+      itemPosition = position - i - 1;
+      $(item).attr('position', itemPosition);
+    });
+    nextItems.each(function(i, item) {
+      itemPosition = position + i + 1;
+      $(item).attr('position', itemPosition);
     });
   }
 };
