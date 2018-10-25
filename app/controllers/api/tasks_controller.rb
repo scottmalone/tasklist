@@ -1,12 +1,10 @@
 module Api
   class TasksController < ApplicationController
     before_action :authenticate_user!
-    before_action :set_task, only: [:edit, :update, :destroy]
+    before_action :set_task, only: [:update, :destroy]
 
     # POST /api/tasks
     def create
-      #formatted_date = Date.strptime(task_params[:due], '%m/%d/%Y')
-      #task = Task.new(task_params.merge(user: current_user, due: formatted_date))
       task = Task.new(task_params.merge(user: current_user))
 
       if task.save
@@ -18,13 +16,18 @@ module Api
 
     # PUT /api/tasks/:id
     def update
-      task = Task.find(params[:id])
-
-      if task.update(task_params)
-        render jsonapi: task
+      if @task.update(task_params)
+        render jsonapi: @task
       else
-        render jsonapi_errors: task.errors
+        render jsonapi_errors: @task.errors
       end
+    end
+
+    # DELETE /api/tasks/:id
+    def destroy
+      @task.destroy
+      
+      head :no_content
     end
 
     private

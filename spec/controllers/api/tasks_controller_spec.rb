@@ -118,4 +118,32 @@ RSpec.describe Api::TasksController, type: :controller do
       end
     end
   end
+
+  describe "DELETE #destroy" do
+    let(:task) { create(:task) }
+
+    context "when sender is logged in" do
+      login_user
+
+      it "should get a no content (204) response" do
+        task
+        delete :destroy, params: { id: task.id }
+        expect(response).to have_http_status(:no_content)
+      end
+
+      it "should destroy the record" do
+        task
+        expect(Task.count).to eq 1
+        delete :destroy, params: { id: task.id }
+        expect(Task.count).to eq 0
+      end
+    end
+
+    context "when sender is not logged in" do
+      it "returns http redirect" do
+        delete :destroy, params: { id: task.id }
+        expect(response).to have_http_status(:redirect)
+      end
+    end
+  end
 end

@@ -15,19 +15,4 @@ RSpec.describe "Task", type: :system do
       expect(page).to have_text("Task List")
     end
   end
-
-  #context "when user clicks chat from account", js: true do
-    #before do
-      #message
-      #visit my_reviews_path
-      #within("#review-#{review.id}") do
-        #find(:css, '.menuBars').click
-      #end
-      #click_on('Chat')
-    #end
-
-    #it "displays the chat message" do
-      #expect(page).to have_text("MyMessage")
-    #end
-  #end
 end

@@ -5,6 +5,7 @@ const tasklist = {
     tasklist.bindToggleCompleted();
     tasklist.bindShowCompletedCheckbox();
     tasklist.activateSortable();
+    tasklist.bindDeleteTask();
   },
   bindNewTask: function() {
     $("#new-task-link").click(function() {
@@ -54,6 +55,23 @@ const tasklist = {
       });
 
       e.preventDefault();
+    });
+  },
+  bindDeleteTask: function() {
+    $(".panel-group").on("click", ".delete-task-link", function (e) {
+      const link = $(this);
+      const task = $(link).closest(".task");
+      const taskID = $(task).attr("task_id");
+      const url = `/api/tasks/${taskID}`;
+      $.ajax({
+        type: "DELETE",
+        url: url,
+        success: function(response) {
+          tasklist.decrementPositionsAfterItem(task);
+          task.remove();
+        }
+      });
+      return false;
     });
   },
   bindToggleCompleted: function() {
@@ -149,10 +167,10 @@ const tasklist = {
         ui.item.startIndex = ui.item.index();
       },
       stop: function(event, ui) {
-        var currentPosition = parseInt(ui.item.attr("position"));
-        var positionChange =  ui.item.index() - ui.item.startIndex;
-        var newPosition = currentPosition + positionChange;
-        var taskItem = ui.item[0];
+        const currentPosition = parseInt(ui.item.attr("position"));
+        const positionChange =  ui.item.index() - ui.item.startIndex;
+        const newPosition = currentPosition + positionChange;
+        const taskItem = ui.item[0];
         tasklist.updateTaskPosition(taskItem, newPosition).then(function(result) {
           tasklist.repositionItem($(taskItem), result.data.attributes.position);
         });
@@ -161,9 +179,9 @@ const tasklist = {
     });
   },
   updateTaskPosition: function(taskItem, taskPosition) {
-    var taskId = taskItem.attributes.task_id.value;
-    var url = '/api/tasks/' + taskId;
-    var data = $.param({ task: { position: taskPosition }});
+    const taskId = taskItem.attributes.task_id.value;
+    const url = '/api/tasks/' + taskId;
+    const data = $.param({ task: { position: taskPosition }});
     return $.ajax({
       url: url,
       type: 'PUT',
@@ -175,10 +193,10 @@ const tasklist = {
   repositionItem: function(taskItem, position) {
     taskItem.attr('position', position);
     taskItem.removeAttr('style');
-    var previousItems = taskItem.prevAll();
-    var nextItems = taskItem.nextAll();
-    var previousItemsLength = previousItems.length ;
-    var nextItemsLength = nextItems.length;
+    const previousItems = taskItem.prevAll();
+    const nextItems = taskItem.nextAll();
+    const previousItemsLength = previousItems.length ;
+    const nextItemsLength = nextItems.length;
     var itemPosition;
     previousItems.each(function(i, item) {
       itemPosition = position - i - 1;
@@ -186,6 +204,14 @@ const tasklist = {
     });
     nextItems.each(function(i, item) {
       itemPosition = position + i + 1;
+      $(item).attr('position', itemPosition);
+    });
+  },
+  decrementPositionsAfterItem: function(task) {
+    const nextItems = task.nextAll();
+    var itemPosition;
+    nextItems.each(function(i, item) {
+      itemPosition = parseInt($(item).attr("position")) - 1;
       $(item).attr('position', itemPosition);
     });
   }

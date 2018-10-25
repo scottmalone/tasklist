@@ -5,7 +5,6 @@ RSpec.describe Task do
 
   it "creates a new instance given valid attributes" do
     create(:task)
-    byebug
     expect(Task.count).to eq(1)
   end
 
