@@ -1,14 +1,14 @@
 <% if task.completed %>
-<div class="task completed panel panel-success" task_id=<%= task.id %> user_id=<%= task.user_id %> position=<%= task.position %> completed="true" style="display: none;">
+<div class="task completed panel panel-success" task_id=<%= task.id %> user_id=<%= task.user_id %> position=<%= task.position %> completed="true" due=<%= task.due %> style="display: none;">
 <% else %>
-<div class="task panel panel-primary" task_id=<%= task.id %> user_id=<%= task.user_id %> position=<%= task.position %> completed="false">
+<div class="task panel panel-primary" task_id=<%= task.id %> user_id=<%= task.user_id %> position=<%= task.position %> completed="false" due=<%= task.due %>>
 <% end %>
   <div class="task-heading panel-heading">
     <div class="task-draggable">
       <i class="draggable-arrows fa fa-arrows fa-lg"></i>
     </div>
     <div class="task-due">
-      Due: <%= task.due.strftime("%b %d, %Y") %>
+      Due: <span class="localized-due-date"></span>
     </div>
     <div class="task-buttons">
       <a href="#" class="toggle-completed-link" title="Mark/Unmark as Completed"><i class="task-mark-completed fa fa-check-square-o fa-lg"></i></a>

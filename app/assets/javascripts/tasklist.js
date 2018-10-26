@@ -1,11 +1,27 @@
 const tasklist = {
   setup: function() {
+    tasklist.setLocalizedDates();
     tasklist.bindNewTask();
     tasklist.bindEditTask();
     tasklist.bindToggleCompleted();
     tasklist.bindShowCompletedCheckbox();
     tasklist.activateSortable();
     tasklist.bindDeleteTask();
+  },
+  setLocalizedDates: function() {
+    $(".task").each(function() {
+      tasklist.setLocalizedDate($(this));
+    });
+  },
+  setLocalizedDate: function(task) {
+    const currentDueDate = $(task).attr("due");
+    const formattedDueDate = tasklist.localizedDate(currentDueDate);
+    $(task).find(".localized-due-date").html(formattedDueDate);
+  },
+  localizedDate: function(date) {
+    const localizedDueDate = new Date(date);
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return localizedDueDate.toLocaleDateString('en-US', options);
   },
   bindNewTask: function() {
     $("#new-task-link").click(function() {
@@ -34,7 +50,14 @@ const tasklist = {
   },
   bindEditTask: function() {
     $(".panel-group").on("click", ".edit-task-link", function (e) {
-      tasklist.getEditTaskForm(this);
+      const link = $(this);
+      const task = $(link).closest(".task");
+      if(!$(".task .edit-task-form").length) {
+        tasklist.getEditTaskForm(this);
+        const currentDueDate = $(task).attr("due");
+        const localizedDueDate = new Date(currentDueDate);
+        $(".task .datepicker").datepicker('setDate', localizedDueDate);
+      }
       return false;
     });
 
@@ -105,9 +128,11 @@ const tasklist = {
   },
   addNewUITask: function(response) {
     const template = JST['templates/tasks/show'];
-    const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
-    const dueDate  = new Date(response.data.attributes.due);
-    response.data.attributes["due"] = dueDate.toLocaleDateString("en-US", dateOptions);
+    //const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+    //const dueDate  = new Date(response.data.attributes.due);
+    const formattedDueDate = tasklist.localizedDate(response.data.attributes.due);
+    //response.data.attributes["due"] = dueDate.toLocaleDateString("en-US", dateOptions);
+    response.data.attributes["due"] = formattedDueDate;
     const html = template({
       task: response.data.attributes
     });
@@ -128,9 +153,11 @@ const tasklist = {
   },
   updateUITask: function(task, response) {
     const template = JST['templates/tasks/show'];
-    const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
-    const dueDate  = new Date(response.data.attributes.due);
-    response.data.attributes["due"] = dueDate.toLocaleDateString("en-US", dateOptions);
+    //const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+    //const dueDate  = new Date(response.data.attributes.due);
+    const formattedDueDate = tasklist.localizedDate(response.data.attributes.due);
+    //response.data.attributes["due"] = dueDate.toLocaleDateString("en-US", dateOptions);
+    response.data.attributes["due"] = formattedDueDate;
     const html = template({
       task: response.data.attributes
     });
