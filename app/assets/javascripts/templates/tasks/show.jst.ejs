@@ -1,10 +1,10 @@
-<div class="task<%= task.completed ? ' completed' : '' %> panel <%= task.completed ? 'panel-success' : 'panel-primary' %>" task_id=<%= task.id %> user_id=<%= task.user_id %> position=<%= task.position %> completed=<%= task.completed %> due=<%= task.due %>>
+<div class="task<%= task.completed ? ' completed' : '' %> panel <%= task.completed ? 'panel-success' : 'panel-primary' %>" task_id=<%= task.id %> user_id=<%= task.user_id %> position=<%= task.position %> completed=<%= task.completed %> due="<%= task.due %>">
   <div class="task-heading panel-heading">
     <div class="task-draggable">
       <i class="draggable-arrows fa fa-arrows fa-lg"></i>
     </div>
     <div class="task-due">
-      Due: <%= task.due %>
+      Due: <span class="localized-due-date"></span>
     </div>
     <div class="task-buttons">
       <a href="#" class="toggle-completed-link" title="Mark/Unmark as Completed"><i class="task-mark-completed fa fa-check-square-o fa-lg"></i></a>

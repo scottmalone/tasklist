@@ -128,10 +128,7 @@ const tasklist = {
   },
   addNewUITask: function(response) {
     const template = JST['templates/tasks/show'];
-    //const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
-    //const dueDate  = new Date(response.data.attributes.due);
     const formattedDueDate = tasklist.localizedDate(response.data.attributes.due);
-    //response.data.attributes["due"] = dueDate.toLocaleDateString("en-US", dateOptions);
     response.data.attributes["due"] = formattedDueDate;
     const html = template({
       task: response.data.attributes
@@ -153,15 +150,12 @@ const tasklist = {
   },
   updateUITask: function(task, response) {
     const template = JST['templates/tasks/show'];
-    //const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
-    //const dueDate  = new Date(response.data.attributes.due);
-    const formattedDueDate = tasklist.localizedDate(response.data.attributes.due);
-    //response.data.attributes["due"] = dueDate.toLocaleDateString("en-US", dateOptions);
-    response.data.attributes["due"] = formattedDueDate;
     const html = template({
       task: response.data.attributes
     });
     $(task).replaceWith(html);
+    task = $(".task[task_id='" + response.data.attributes.id + "']")
+    tasklist.setLocalizedDate(task);
   },
   updateToggleCompletedUI: function(task) {
     $(task).toggleClass("completed");
