@@ -51,7 +51,6 @@ gem 'jquery-rails'
 gem 'jquery-ui-rails'
 gem 'jsonapi-rails'
 gem "font-awesome-rails"
-#gem 'carrierwave'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
@@ -79,7 +78,6 @@ group :test do
   gem 'capybara-selenium'
   gem "database_cleaner"
   gem "launchy"
-  gem "nokogiri"
   gem 'rails-controller-testing'
   gem 'shoulda-matchers'
   gem 'timecop'
