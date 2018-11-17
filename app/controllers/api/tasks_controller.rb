@@ -16,6 +16,7 @@ module Api
 
     # PUT /api/tasks/:id
     def update
+      #TODO pundit
       if @task.update(task_params)
         render jsonapi: @task
       else
@@ -25,6 +26,7 @@ module Api
 
     # DELETE /api/tasks/:id
     def destroy
+      #TODO pundit
       @task.destroy
       
       head :no_content
@@ -32,12 +34,12 @@ module Api
 
     private
 
-    def set_task
-      @task = Task.find(params[:id])
-    end
+      def set_task
+        @task = Task.find(params[:id])
+      end
 
-    def task_params
-      params.require(:task).permit(:position, :completed, :due, :description)
-    end
+      def task_params
+        params.require(:task).permit(:position, :completed, :due, :description)
+      end
   end
 end

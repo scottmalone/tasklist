@@ -1,0 +1,13 @@
+<form class="new-attachment-form" action="/api/attachments" accept-charset="UTF-8" method="post"><input name="utf8" type="hidden" value="&#x2713;" />
+  <input type="hidden" name="authenticity_token" value="<%= authenticity_token %>" />
+  <input type="hidden" name="task_id" value="<%= task_id %>" />
+
+  <div class="field">
+    <label for="new-attachment-file">File:</label>
+    <input type="file" id="new-attachment-file" name="attachment_file" accept="image/png, image/jpeg" />
+  </div>
+
+  <div class="actions">
+    <input type="submit" name="commit" value="Upload Attachment" data-disable-with="Upload Attachment" />
+  </div>
+</form>

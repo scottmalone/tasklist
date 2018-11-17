@@ -7,22 +7,28 @@ const tasklist = {
     tasklist.bindShowCompletedCheckbox();
     tasklist.activateSortable();
     tasklist.bindDeleteTask();
+    tasklist.bindUploadAttachment();
+    tasklist.bindDeleteAttachment();
   },
+
   setLocalizedDates: function() {
     $(".task").each(function() {
       tasklist.setLocalizedDate($(this));
     });
   },
+
   setLocalizedDate: function(task) {
     const currentDueDate = $(task).attr("due");
     const formattedDueDate = tasklist.localizedDate(currentDueDate);
     $(task).find(".localized-due-date").html(formattedDueDate);
   },
+
   localizedDate: function(date) {
     const localizedDueDate = new Date(date);
     const options = { year: 'numeric', month: 'short', day: 'numeric' };
     return localizedDueDate.toLocaleDateString('en-US', options);
   },
+
   bindNewTask: function() {
     $("#new-task-link").click(function() {
       tasklist.getNewTaskForm();
@@ -48,6 +54,7 @@ const tasklist = {
       e.preventDefault();
     });
   },
+
   bindEditTask: function() {
     $(".panel-group").on("click", ".edit-task-link", function (e) {
       const link = $(this);
@@ -80,6 +87,7 @@ const tasklist = {
       e.preventDefault();
     });
   },
+
   bindDeleteTask: function() {
     $(".panel-group").on("click", ".delete-task-link", function (e) {
       const link = $(this);
@@ -94,9 +102,11 @@ const tasklist = {
           task.remove();
         }
       });
-      return false;
+
+      e.preventDefault();
     });
   },
+
   bindToggleCompleted: function() {
     $(".panel-group").on("click", ".toggle-completed-link", function (e) {
       const link = $(this);
@@ -112,9 +122,64 @@ const tasklist = {
           tasklist.updateToggleCompletedUI(task);
         }
       });
-      return false;
+
+      e.preventDefault();
     });
   },
+
+  bindUploadAttachment: function() {
+    $(".panel-group").on("click", ".upload-attachment-link", function (e) {
+      const link = $(this);
+      const task = $(link).closest(".task");
+      const taskID = $(task).attr("task_id");
+      if(!$(".task .new-attachment-form").length) {
+        tasklist.getUploadAttachmentForm(this);
+      }
+
+      e.preventDefault();
+    });
+
+    $(".panel-group").on("submit", ".new-attachment-form", function (e) {
+      const form = $(this);
+      const url = form.attr('action');
+      const task = $(form).closest(".task");
+
+      $.ajax({
+        type: "POST",
+        url: url,
+        data: new FormData(this),
+        contentType: false,
+        cache: false,
+        processData:false,
+        success: function(response) {
+          tasklist.getUploadAttachmentForm(form);
+          tasklist.updateUIAttachment(task, response);
+        }
+      });
+
+      e.preventDefault();
+    });
+  },
+
+  bindDeleteAttachment: function() {
+    $(".panel-group").on("click", ".delete-attachment-link", function (e) {
+      const link = $(this);
+      const attachment = $(link).closest(".attachment");
+      const attachmentID = $(attachment).attr("attachment_id");
+      const url = `/api/attachments/${attachmentID}`;
+
+      $.ajax({
+        type: "DELETE",
+        url: url,
+        success: function(response) {
+          $(attachment).remove();
+        }
+      });
+
+      e.preventDefault();
+    });
+  },
+
   getNewTaskForm: function() {
     const newTemplate = JST['templates/tasks/new'];
     const html = newTemplate({
@@ -123,9 +188,11 @@ const tasklist = {
     $("#new-task-container").html(html);
     $("#new-task-container .datepicker").datepicker();
   },
+
   removeNewTaskForm: function() {
     $("#new-task-container").empty();
   },
+
   addNewUITask: function(response) {
     const template = JST['templates/tasks/show'];
     const formattedDueDate = tasklist.localizedDate(response.data.attributes.due);
@@ -135,6 +202,7 @@ const tasklist = {
     });
     $(".panel-group").prepend(html);
   },
+
   getEditTaskForm: function(link) {
     const task = $(link).closest(".task");
     const taskBody = $(task).find(".panel-body");
@@ -148,6 +216,20 @@ const tasklist = {
     $(taskBody).html(html);
     $(taskBody).find(".datepicker").datepicker();
   },
+
+  getUploadAttachmentForm: function(obj) {
+    const task = $(obj).closest(".task");
+    const taskFooter = $(task).find(".panel-footer");
+    const newAttachmentTemplate = JST['templates/attachments/new'];
+    const html = newAttachmentTemplate({
+      authenticity_token: window._token,
+      task_id: task.attr("task_id")
+    });
+    $(task).find(".new-attachment-form").remove();
+    $(taskFooter).prepend(html);
+    $(taskFooter).removeClass("invisible");
+  },
+
   updateUITask: function(task, response) {
     const template = JST['templates/tasks/show'];
     const html = template({
@@ -157,6 +239,15 @@ const tasklist = {
     task = $(".task[task_id='" + response.data.attributes.id + "']")
     tasklist.setLocalizedDate(task);
   },
+
+  updateUIAttachment: function(task, response) {
+    const template = JST['templates/attachments/show'];
+    const html = template({
+      attachment: response.data.attributes
+    });
+    $(task).find(".attachments").append(html);
+  },
+
   updateToggleCompletedUI: function(task) {
     $(task).toggleClass("completed");
     if($(task).hasClass("completed")) {
@@ -170,9 +261,11 @@ const tasklist = {
       }, 500);
     };
   },
+
   isShowCompletedChecked: function() {
     return $("#show-completed-checkbox:checked").length > 0;
   },
+
   bindShowCompletedCheckbox: function() {
     $("#show-completed-checkbox").change(function() {
       if(this.checked) {
@@ -182,6 +275,7 @@ const tasklist = {
       }
     });
   },
+
   activateSortable: function() {
     $("#task-container").sortable({
       start: function(event, ui) {
@@ -199,6 +293,7 @@ const tasklist = {
       axis: "y"
     });
   },
+
   updateTaskPosition: function(taskItem, taskPosition) {
     const taskId = taskItem.attributes.task_id.value;
     const url = '/api/tasks/' + taskId;
@@ -211,6 +306,7 @@ const tasklist = {
       $("#task-container").sortable("cancel");
     });
   },
+
   repositionItem: function(taskItem, position) {
     taskItem.attr('position', position);
     taskItem.removeAttr('style');
@@ -228,6 +324,7 @@ const tasklist = {
       $(item).attr('position', itemPosition);
     });
   },
+
   decrementPositionsAfterItem: function(task) {
     const nextItems = task.nextAll();
     var itemPosition;

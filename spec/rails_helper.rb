@@ -56,8 +56,8 @@ RSpec.configure do |config|
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_path = "#{::Rails.root}/spec/fixtures"
 
-  config.extend ControllerMacros, type: :controller
   config.extend ControllerMacros, type: :view
+  config.include Devise::Test::IntegrationHelpers, type: :request
 
   #include helper file for mailer syntax
   config.include(MailerMacros)
@@ -69,8 +69,6 @@ RSpec.configure do |config|
   config.include Rails.application.routes.url_helpers
 
   config.include Requests::JsonHelpers, type: :request
-  config.include Requests::JsonHelpers, type: :controller
-
 
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false

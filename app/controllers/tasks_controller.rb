@@ -3,6 +3,6 @@ class TasksController < ApplicationController
 
   # GET /tasks
   def index
-    @tasks = current_user.tasks.order(position: :asc)
+    @tasks = Task.with_attached_attachments.where(user: current_user).order(position: :asc)
   end
 end

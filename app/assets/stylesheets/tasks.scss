@@ -22,7 +22,7 @@
 .task-due {
   float: left;
 }
-.task-buttons {
+.task-buttons, .attachment-buttons {
   float: right;
 }
 .new-task {
@@ -35,4 +35,15 @@
 .task-edit, .task-delete, .task-mark-completed {
   margin-left: 5px;
   color: white;
+}
+.attachment-buttons a {
+  margin-left: 5px;
+  color: #428bca;
+}
+.panel-footer a:hover {
+  background-color: #f5f5f5;
+}
+.panel-footer.invisible {
+  padding: 0;
+  height: 0;
 }

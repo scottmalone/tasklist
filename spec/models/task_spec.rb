@@ -43,4 +43,18 @@ RSpec.describe Task do
       expect(task2.reload.position).to eq 1
     end
   end
+
+  describe "attachments" do
+    it "can be attached" do
+      task = create(:task, :with_attachment)
+      expect(task.attachments.attached?).to be true
+    end
+
+    it "can be deleted" do
+      task = create(:task, :with_attachment)
+      expect(task.attachments.attached?).to be true
+      task.attachments.purge
+      expect(task.attachments.attached?).to be false
+    end
+  end
 end

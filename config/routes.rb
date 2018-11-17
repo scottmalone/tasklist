@@ -9,9 +9,13 @@ Rails.application.routes.draw do
 
   resources :tasks
 
+  resources :attachments, only: :show
+
   namespace :api do
     resources :tasks
+    resources :attachments
   end
+
 
   get "/healthcheck", to: "healthcheck#index"
 end

@@ -1,7 +1,8 @@
 require 'rails_helper'
 
-RSpec.describe Api::TasksController, type: :controller do
-  describe "POST #create" do
+RSpec.describe "Tasks API", type: :request do
+  describe "POST /api/tasks" do
+    let(:user) { create(:user) }
     let(:post_params) do
       {
         task: {
@@ -10,45 +11,41 @@ RSpec.describe Api::TasksController, type: :controller do
         }
       }
     end
-    context "when sender is logged in" do
-      login_user
 
+    context "when sender is signed in" do
       before do
+        sign_in user
         frozen_time = Time.local(2020, 11, 3, 0, 0, 0)
         Timecop.freeze(frozen_time)
-        post :create, params: post_params
+        post "/api/tasks", params: post_params
       end
 
       after do
         Timecop.return
       end
 
-      it "should have a current_user" do
-        expect(subject.current_user).to_not eq(nil)
-      end
-
-      it "responds to json by default" do
-        expect(response.content_type).to eq "application/vnd.api+json"
-      end
-
       it "should get a successful (200) response" do
         expect(response).to have_http_status(:ok)
       end
 
-      it "one task should be created" do
+      it "responds with json by default" do
+        expect(response.content_type).to eq "application/vnd.api+json"
+      end
+
+      it "creates one record" do
         expect(Task.count).to eq 1
       end
 
-      it "the response body has the POSTed attributes" do
+      it "has the POSTed attributes in the response body" do
         resp_attrs = JSON.parse(response.body)["data"]["attributes"]
         expect(resp_attrs["description"]).to eq post_params[:task][:description]
         expect(resp_attrs["due"].to_datetime).to eq post_params[:task][:due].to_datetime
       end
     end
 
-    context "when sender is not logged in" do
+    context "when sender is not signed in" do
       before do
-        post :create, params: post_params
+        post "/api/tasks", params: post_params
       end
 
       it "returns http redirect" do
@@ -57,7 +54,7 @@ RSpec.describe Api::TasksController, type: :controller do
     end
   end
 
-  describe "PUT #update" do
+  describe "PUT /api/tasks/:id" do
     let(:task) { create(:task) }
     let(:put_params) do
       {
@@ -68,24 +65,20 @@ RSpec.describe Api::TasksController, type: :controller do
         }
       }
     end
-    context "when sender is logged in" do
-      login_user
 
+    context "when sender is signed in" do
       before do
+        sign_in task.user
         frozen_time = Time.local(2020, 11, 3, 0, 0, 0)
         Timecop.freeze(frozen_time)
-        put :update, params: put_params.merge(id: task.id)
+        put "/api/tasks/#{task.id}", params: put_params
       end
 
       after do
         Timecop.return
       end
 
-      it "should have a current_user" do
-        expect(subject.current_user).to_not eq(nil)
-      end
-
-      it "responds to json by default" do
+      it "responds with json by default" do
         expect(response.content_type).to eq "application/vnd.api+json"
       end
 
@@ -100,49 +93,70 @@ RSpec.describe Api::TasksController, type: :controller do
       end
 
       it "can mark an item as completed" do
-        expect(task.completed).to eq false
-        put :update, params: {id: task.id, task: { completed: true } }
         resp_attrs = JSON.parse(response.body)["data"]["attributes"]
         expect(task.reload.completed).to eq true
         expect(resp_attrs["completed"]).to eq true
       end
     end
 
-    context "when sender is not logged in" do
+    context "when sender is not signed in" do
       before do
-        put :update, params: put_params.merge(id: task.id)
+        put "/api/tasks/#{task.id}", params: put_params
       end
 
       it "returns http redirect" do
         expect(response).to have_http_status(:redirect)
+      end
+    end
+
+    context "when incorrect user is signed in" do
+      before do
+        sign_in create(:user)
+        put "/api/tasks/#{task.id}", params: put_params
+      end
+
+      it "returns http redirect" do
+        expect(response).to have_http_status(:forbidden)
       end
     end
   end
 
-  describe "DELETE #destroy" do
+  describe "DELETE /api/tasks/:id" do
     let(:task) { create(:task) }
 
-    context "when sender is logged in" do
-      login_user
+    context "when sender is signed in" do
+      before do
+        sign_in task.user
+        delete "/api/tasks/#{task.id}"
+      end
 
       it "should get a no content (204) response" do
-        task
-        delete :destroy, params: { id: task.id }
         expect(response).to have_http_status(:no_content)
       end
 
       it "should destroy the record" do
-        task
-        expect(Task.count).to eq 1
-        delete :destroy, params: { id: task.id }
         expect(Task.count).to eq 0
       end
     end
 
-    context "when sender is not logged in" do
+    context "when sender is not signed in" do
+      before do
+        delete "/api/tasks/#{task.id}"
+      end
+
       it "returns http redirect" do
-        delete :destroy, params: { id: task.id }
         expect(response).to have_http_status(:redirect)
+      end
+    end
+
+    context "when incorrect user is signed in" do
+      before do
+        sign_in create(:user)
+        delete "/api/tasks/#{task.id}"
+      end
+
+      it "returns http redirect" do
+        expect(response).to have_http_status(:forbidden)
       end
     end
   end
