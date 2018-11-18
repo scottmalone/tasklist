@@ -16,7 +16,7 @@ module Api
 
     # PUT /api/tasks/:id
     def update
-      #TODO pundit
+      authorize @task
       if @task.update(task_params)
         render jsonapi: @task
       else
@@ -26,7 +26,7 @@ module Api
 
     # DELETE /api/tasks/:id
     def destroy
-      #TODO pundit
+      authorize @task
       @task.destroy
       
       head :no_content

@@ -4,8 +4,8 @@ module Api
 
     # POST /api/attachments
     def create
-      #TODO pundit
       task = Task.find(params[:task_id])
+      authorize task, :create_attachment?
       task.attachments.attach(params[:attachment_file])
       attachment = Attachment.new(task.attachments.last)
 
@@ -14,8 +14,8 @@ module Api
 
     # DELETE /api/attachments/:id
     def destroy
-      #TODO pundit
       attachment = ActiveStorage::Attachment.find(params[:id])
+      authorize attachment
       attachment.purge
       
       head :no_content

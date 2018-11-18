@@ -3,8 +3,8 @@ class AttachmentsController < ApplicationController
 
   # GET /attachments/1
   def show
-    #TODO pundit
     attachment = ActiveStorage::Attachment.find(params[:id])
+    authorize attachment
     send_data attachment.download, disposition: 'inline', filename: attachment.filename.to_s
   end
 end
