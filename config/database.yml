@@ -6,7 +6,9 @@ default: &default
 development:
   <<: *default
   database: tasklist_development
+  host: localhost
 
 test:
   <<: *default
   database: tasklist_test
+  host: localhost
