@@ -56,7 +56,7 @@ gem "pundit"
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
-  gem 'rspec-rails', '~> 3.8'
+  gem 'rspec-rails'
   gem 'awesome_print'
   gem "factory_bot_rails"
   gem 'faker'
@@ -74,10 +74,11 @@ group :development do
 end
 
 group :test do
-  gem 'capybara', '>= 2.15'
+  gem 'capybara'
   gem 'capybara-email'
-  gem 'capybara-selenium'
-  gem "database_cleaner"
+  gem "capybara-webkit", '>=1.15.1'
+  gem 'selenium-webdriver', require: false
+  gem 'webdrivers', '~> 4.0'
   gem "launchy"
   gem 'rails-controller-testing'
   gem 'shoulda-matchers'

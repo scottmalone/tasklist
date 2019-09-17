@@ -32,12 +32,15 @@ rescue ActiveRecord::PendingMigrationError => e
 end
 
 require 'rubygems'
+require 'capybara'
 require 'webmock/rspec'
 require 'factory_bot_rails'
 require 'faker'
 require 'devise'
 require 'pry'
 require 'sidekiq/testing'
+
+WebMock.disable_net_connect!(allow_localhost: true)
 
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
@@ -49,8 +52,6 @@ end
 Mail.defaults do
   delivery_method :test
 end
-
-WebMock.disable_net_connect!(allow_localhost: true)
 
 RSpec.configure do |config|
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
